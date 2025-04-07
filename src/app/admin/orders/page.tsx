@@ -78,10 +78,6 @@ export default function OrdersPage() {
     status: "all",
   });
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-<<<<<<< HEAD
-=======
-  
->>>>>>> Caroline
 
   useEffect(() => {
     const fetchOrders = async () => {
