@@ -1,6 +1,6 @@
 "use client";
-import { notFound } from "next/navigation";
 import { useState, useEffect } from "react";
+import { notFound } from "next/navigation";
 
 type Order = {
   id: number;
@@ -10,13 +10,20 @@ type Order = {
   customer: {
     name: string;
   };
+  items: { name: string; price: number; quantity: number; total: number }[]; // Example for goods/services
+  credits: number;
+  discounts: number;
+  taxes: number;
+  payment_method: string;
 };
 
 export default function OrderDetailPage({ params }: { params: { id: string } }) {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+  // Function to fetch the order
   useEffect(() => {
     const fetchOrder = async () => {
       try {
@@ -60,61 +67,84 @@ export default function OrderDetailPage({ params }: { params: { id: string } }) 
     return notFound();
   }
 
-  // Function to trigger printing
+  // Function to handle the modal visibility
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
+
+  // Function to trigger printing the receipt
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <div className="receipt-container p-6 bg-white shadow-lg max-w-md mx-auto rounded-md">
-      <div className="header text-center mb-6">
-        {/* Optional: You can add a logo or company name here */}
-        <h1 className="text-3xl font-bold text-gray-800">Your Company Name</h1>
-        <p className="text-lg text-gray-600">Order Receipt</p>
-        <hr className="my-4 border-gray-300" />
-      </div>
-
-      <div className="order-details mb-6">
-        <p className="text-lg">
-          <strong>Order ID:</strong> #{order.id}
-        </p>
-        <p className="text-lg">
-          <strong>Customer:</strong> {order.customer.name}
-        </p>
-        <p className="text-lg">
-          <strong>Status:</strong> {order.status}
-        </p>
-        <p className="text-lg">
-          <strong>Date:</strong> {new Date(order.created_at).toLocaleDateString()}
-        </p>
-      </div>
-
-      <div className="total-amount text-xl font-semibold text-right mb-6">
-        <p>
-          <strong>Total Amount:</strong> Ksh {order.total_amount.toFixed(2)}
-        </p>
-      </div>
-
-      {/* Optional: Add a footer with business information */}
-      <div className="footer text-center text-sm text-gray-600 mt-8">
-        <p>Your Company Name</p>
-        <p>Address Line, City, Country</p>
-        <p>Email: contact@yourcompany.com</p>
-        <p>Phone: +123 456 7890</p>
-        <hr className="my-4 border-gray-300" />
-        <p>Thank you for your business!</p>
-      </div>
-
-      {/* Print button */}
-      <div className="print-button text-center mt-8">
+    <div>
+      <div className="order-details">
+        <h1 className="text-2xl font-bold mb-4">Order #{order.id}</h1>
+        <p><strong>Customer:</strong> {order.customer.name}</p>
+        <p><strong>Status:</strong> {order.status}</p>
+        <p><strong>Date:</strong> {new Date(order.created_at).toLocaleDateString()}</p>
         <button
-          onClick={handlePrint}
-          className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          onClick={toggleModal}
+          className="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          Print Receipt
+          View Receipt
         </button>
       </div>
+
+      {/* Modal for the receipt */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96 max-w-full">
+            <h2 className="text-3xl font-bold text-center mb-4">Receipt</h2>
+            <div className="order-items mb-6">
+              <table className="w-full text-left">
+                <thead>
+                  <tr>
+                    <th className="border-b py-2 px-4">Item</th>
+                    <th className="border-b py-2 px-4">Price</th>
+                    <th className="border-b py-2 px-4">Quantity</th>
+                    <th className="border-b py-2 px-4">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.items.map((item) => (
+                    <tr key={item.name}>
+                      <td className="border-b py-2 px-4">{item.name}</td>
+                      <td className="border-b py-2 px-4">Ksh {item.price.toFixed(2)}</td>
+                      <td className="border-b py-2 px-4">{item.quantity}</td>
+                      <td className="border-b py-2 px-4">Ksh {item.total.toFixed(2)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="pricing-summary mb-6">
+              <p><strong>Credits:</strong> Ksh {order.credits.toFixed(2)}</p>
+              <p><strong>Discounts:</strong> Ksh {order.discounts.toFixed(2)}</p>
+              <p><strong>Taxes:</strong> Ksh {order.taxes.toFixed(2)}</p>
+              <p><strong>Total Amount Paid:</strong> Ksh {order.total_amount.toFixed(2)}</p>
+              <p><strong>Payment Method:</strong> {order.payment_method}</p>
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={handlePrint}
+                className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 mb-4"
+              >
+                Print Receipt
+              </button>
+              <button
+                onClick={toggleModal}
+                className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
