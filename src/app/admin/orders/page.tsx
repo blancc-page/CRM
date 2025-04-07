@@ -51,25 +51,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
-type OrderItem = {
-  id: number;
-  order_id: number;
-  item_name: string;
-  quantity: number;
-  price_per_unit: number;
-  total_price: number;
-};
-
 type Order = {
   id: number;
-  customer_name: string;
+  customer_id: number;
   total_amount: number;
-  tax: number;
   status: "completed" | "pending" | "cancelled";
   created_at: string;
-  location: string;
-  phone: string;
-  items: OrderItem[]; // <- this line
+  customer: {
+    name: string;
+  };
 };
 
 export default function OrdersPage() {
@@ -88,7 +78,6 @@ export default function OrdersPage() {
     status: "all",
   });
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
-  
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -115,7 +104,7 @@ export default function OrdersPage() {
         return false;
       }
       return (
-        order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.id.toString().includes(searchTerm)
       );
     });
@@ -312,7 +301,7 @@ export default function OrdersPage() {
               {filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
-                  <TableCell>{order.customer_name}</TableCell>
+                  <TableCell>{order.customer.name}</TableCell>
                   <TableCell>Ksh {order.total_amount.toFixed(2)}</TableCell>
                   <TableCell>{order.status}</TableCell>
                   <TableCell>{order.created_at}</TableCell>
@@ -323,7 +312,7 @@ export default function OrdersPage() {
                         variant="ghost"
                         onClick={() => {
                           setSelectedOrderId(order.id);
-                          setNewOrderCustomerName(order.customer_name);
+                          setNewOrderCustomerName(order.customer.name);
                           setNewOrderTotal(order.total_amount.toString());
                           setNewOrderStatus(order.status);
                           setIsEditOrderDialogOpen(true);
