@@ -78,6 +78,10 @@ export default function OrdersPage() {
     status: "all",
   });
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+<<<<<<< HEAD
+=======
+  
+>>>>>>> Caroline
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -104,7 +108,11 @@ export default function OrdersPage() {
         return false;
       }
       return (
+<<<<<<< HEAD
         order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+=======
+        order.customer_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+>>>>>>> Caroline
         order.id.toString().includes(searchTerm)
       );
     });
@@ -301,7 +309,11 @@ export default function OrdersPage() {
               {filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.id}</TableCell>
+<<<<<<< HEAD
                   <TableCell>{order.customer.name}</TableCell>
+=======
+                  <TableCell>{order.customer_name}</TableCell>
+>>>>>>> Caroline
                   <TableCell>Ksh {order.total_amount.toFixed(2)}</TableCell>
                   <TableCell>{order.status}</TableCell>
                   <TableCell>{order.created_at}</TableCell>
@@ -312,7 +324,11 @@ export default function OrdersPage() {
                         variant="ghost"
                         onClick={() => {
                           setSelectedOrderId(order.id);
+<<<<<<< HEAD
                           setNewOrderCustomerName(order.customer.name);
+=======
+                          setNewOrderCustomerName(order.customer_name);
+>>>>>>> Caroline
                           setNewOrderTotal(order.total_amount.toString());
                           setNewOrderStatus(order.status);
                           setIsEditOrderDialogOpen(true);
